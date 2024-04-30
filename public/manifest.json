@@ -1,12 +1,28 @@
 {
-    "start_url": "./",
-    "name": "PWA",
-    "display": "standalone",
-    "icons": [
-        {
-            "src": "./icon.png",
-            "sizes": "144x144",
-            "type": "image/png"
+  "start_url": "./",
+  "name": "PWA",
+  "display": "standalone",
+  "icons": [
+    {
+      "src": "./icon.png",
+      "sizes": "144x144",
+      "type": "image/png"
+    }
+  ],
+  "short_name": "D&D Tokenizer",
+  "description": "Some description.",
+  "screenshots": [
+    {
+      "src": "./desktop.jpg",
+      "type": "image/jpeg",
+      "sizes": "1920x1080",
+      "form_factor": "wide"
+    },
+    {
+      "src": "./mobile.png",
+      "type": "image/png",
+      "sizes": "378x672",
+      "form_factor": "narrow"
     }
   ]
-}   
+}
