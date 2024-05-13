@@ -1,58 +1,54 @@
-import { StrictMode, useState, useTransition } from 'react';
+import { StrictMode, useState, useTransition } from "react";
 import { createRoot } from "react-dom/client";
-import { Routes, Route, Outlet, Link, BrowserRouter } from "react-router-dom";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.min.css";
-import IndexPage from "./pages/Index";
-import TaskPage from "./pages/Task";
-import SettingsPage from "./pages/Settings";
-import AppBar from "./components/AppBar";
-import FloatAction from "./components/FloatAction";
-import { Task, getListParents } from "./tasks";
 
-function MainLayout()
-{
-    const [isPending, startTransition] = useTransition();
-    const [page, setPage] = useState('index');
+import MainLayout from "./components/MainLayout";
 
-    function selectTab(nextTab: string) {
-        startTransition(() => {
-            setPage(nextTab);
-        });
+import { TasksPage, TasksLoader } from "./pages/Tasks";
+import { TaskPage, TaskLoader, TaskAction } from "./pages/Task";
+import { SettingsPage, SettingsLoader, SettingsAction } from "./pages/Settings";
+import NotFoundPage from "./pages/NotFound";
+
+const router = createBrowserRouter([
+    {
+        path: "/",
+        element: <MainLayout />,
+        children: [
+            {
+                index: true,
+                path: "tasks/:id?",
+                loader: TasksLoader,
+                element: <TasksPage parent={0} />
+            },
+            {
+                path: "task/:action/:id",
+                loader: TaskLoader,
+                action: TaskAction,
+                element: <TaskPage />
+            },
+            {
+                path: "settings",
+                loader: SettingsLoader,
+                action: SettingsAction,
+                element: <SettingsPage />
+            },
+            {
+                path: "*",
+                element: <NotFoundPage />
+            }
+        ]
     }
-    
-    function clickTaskHandler(task: Task) {
-        //setParent(task);console.log(task)
-        //setParents(getParents(task));
-        //setTasksList([...tasks.getListByParent(task.id)]);
-    }
-    
-    let task = new Task();
-    
-    return (
-        <>
-            <AppBar task={task} />
-            <Outlet />
-            <FloatAction click={()=>{}} />
-        </>
-    );
-}
+]);
 
-let container = document.getElementById('root');
+let container = document.getElementById("root");
 
-if(container)
-{
+if (container) {
     createRoot(container).render(
         <StrictMode>
-            <BrowserRouter>
-                <Routes>
-                    <Route path="/" element={<MainLayout />}>
-                      <Route path="tasks" element={<IndexPage parent={0} />} />
-                      <Route path="task" element={<TaskPage />} />
-                      <Route path="settings" element={<SettingsPage />} />
-                    </Route>
-                </Routes>
-            </BrowserRouter>
+            <RouterProvider router={router} />
         </StrictMode>
     );
 }

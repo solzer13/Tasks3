@@ -11,11 +11,11 @@
   },
   "dependencies": {
     "bootstrap":"",
+    "bootstrap-icons":"",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-bootstrap":"",
-    "react-router-dom":"",
-    "bootstrap-icons":""
+    "react-router-dom":""
   },
   "devDependencies": {
     "@types/react": "^18.2.66",

@@ -1,56 +1,45 @@
-import React from 'react';
-import Navbar from 'react-bootstrap/Navbar';
-//import Button from 'react-bootstrap/Button';
-import { Task, getListParents } from "../tasks";
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import Offcanvas from 'react-bootstrap/Offcanvas';
+import { Task, getListParents, countTasksByParent, countTasksDoneByParent } from "../tasks";
 
-interface AppBarProps
-{
-    task: Task;
+interface AppBarProps {
+    title: string;
 }
 
-export default function AppBar({ task }: AppBarProps) 
-{
-    let breads: React.ReactNode[] = [];
+export default function AppBar({ title }: AppBarProps) {
+    document.title = title;
     
-    let parents = getListParents(task);
-    
-    //parents = parents.reverse();
-    
-    for(let i = 0; i < parents.length; i++){
-        let separator = "";
-        for(let s = 0; s < i; s++){
-            separator += " --- ";
-        }
-        if(i+1 == parents.length){
-            breads.push(
-                <div key={parents[i].id} className="h5  m-0">
-                    {separator}
-                    {parents[i].title}
-                </div>
-            );
-        }
-        //onClick={()=>click(parents[i])}
-        else {
-            breads.push(
-                <div key={parents[i].id} className="h5">
-                    {separator}
-                    <a className="link-light"   style={{cursor: "pointer"}}>{parents[i].title}</a>
-                </div>
-            );
-        }
-    }
-    
-    //let breads = parents.map(task => <div key={task.id} className="">{task.title}</div>)
-    
-    return (<>
-        <Navbar className="navbar bg-primary text-white">
-            <div className="container-fluid">
-                <div className="">
-                    {breads}
-                </div>
-                <div className="h6 m-0">0 / 8</div>
+    const [show, setShow] = useState(false);
+
+    const handleClose = () => setShow(false);
+    const handleShow = () => setShow(true);
+
+    return (
+        <>
+            <div className="navbar d-flex bg-primary text-white">
+                <button
+                    type="button"
+                    onClick={handleShow}
+                    className="btn btn-primary mx-2 my-0 pt-1 pb-0 px-1"
+                >
+                    <i className="bi bi-list h1"></i>
+                </button>
+                <div className="flex-grow-1 h5 p-0 m-0">{title}</div>
+                <div className="h6 px-4 m-0">{countTasksDoneByParent(0)} / {countTasksByParent(0, true)}</div>
             </div>
-        </Navbar>
-    </>);
-}
 
+            <Offcanvas show={show} onHide={handleClose} backdrop={true}>
+                <Offcanvas.Header closeButton>
+                    <Offcanvas.Title>{title}</Offcanvas.Title>
+                </Offcanvas.Header>
+                <Offcanvas.Body>
+                    <ul className="list-group">
+                        <li className="list-group-item"><Link onClick={handleClose} to="/tasks/">Tasks</Link></li>
+                        <li className="list-group-item"><Link onClick={handleClose} to="/settings/">Settings</Link></li>
+                    </ul>
+                </Offcanvas.Body>
+            </Offcanvas>
+        </>
+    );
+}

@@ -1,71 +1,55 @@
 //import React from 'react';
+import { Link } from "react-router-dom";
 import Container from 'react-bootstrap/Container';
 import Dropdown from 'react-bootstrap/Dropdown';
-//import Button from 'react-bootstrap/Button';
-import { Task } from "../tasks";
+import { Task, Tasks, countTasksByParent, countTasksDoneByParent, sortByPosition } from "../tasks";
 
 interface TasksListProps
 {
     tasks: Task[];
-    click: (task: Task) => void;
-    done: (task: Task) => void;
-    up: (task: Task) => void;
-    down: (task: Task) => void;
-    edit: (task: Task) => void;
-    del: (task: Task) => void;
 }
 
-export default function TasksList({ tasks, click, done, up, down, edit, del }: TasksListProps)
+export default function TasksList({ tasks }: TasksListProps)
 {
     if(tasks.length == 0){
         return (<Container className="text-center m-5">Список пуст</Container>);
     }
     
-    let stasks = tasks.sort((a, b) => {
-        if(a.position > b.position) return 1;
-        if(a.position < b.position) return -1;
-        return 0;
-    });
-    
-    const listItems = stasks.map(task =>
-        <TasksListItem 
-            key={task.id} 
-            task={task} 
-            click={click}
-            done={done} 
-            up={up} 
-            down={down} 
-            edit={edit} 
-            del={del} 
-            count={tasks.length}
-        />
-    );
+    tasks = sortByPosition(tasks);
 
-    return (<>{listItems}</>);
+    return (
+        <>
+            {tasks.map((task, index) =>
+                <TasksListItem 
+                    key={index} 
+                    task={task}
+                    count={tasks.length}
+                    stc={countTasksByParent(task.id, true)}
+                    stdc={countTasksDoneByParent(task.id)}
+                />
+            )}
+        </>
+    );
 }
 
 interface TasksListItemProps
 {
     task: Task;
-    click: (task: Task) => void;
-    done: (task: Task) => void;
-    up: (task: Task) => void;
-    down: (task: Task) => void;
-    edit: (task: Task) => void;
-    del: (task: Task) => void;
     count: number;
+    stc: number;
+    stdc: number;
 }
 
-function TasksListItem({ task, click, done, up, down, edit, del, count }: TasksListItemProps)
+function TasksListItem({ task, count, stc, stdc }: TasksListItemProps)
 {
     return (
         <div className="card text-bg-light m-1">
             <div className="card-body p-1">
                 <div className="hstack">
-                    <div className="w-100 p-1" onClick={()=>click(task)} style={{cursor: "pointer"}}>
+                    <Link className="w-100 p-1 link-dark link-underline-opacity-0" to={"/tasks/" + task.id}>
                         <div className={(task.done ? "text-decoration-line-through  " : "")+"h5 p-0 m-0"}>{task.title}</div>
-                        <div className="text-secondary small p-0 m-0">0 / 8</div>
-                    </div>
+                        <div className="text-secondary small p-0 m-0">{stdc} / {stc}</div>
+                    </Link>
                     <div className="p-1">
             
                         <Dropdown>
@@ -74,13 +58,23 @@ function TasksListItem({ task, click, done, up, down, edit, del, count }: TasksL
                           </Dropdown.Toggle>
                     
                           <Dropdown.Menu>
-                            <Dropdown.Item onClick={()=>{ task.done = !task.done; done(task)}}>{task.done ? "Не сделано" : "Сделано"}</Dropdown.Item>
+                            <Dropdown.Item>
+                                <Link to={"/task/done/"+task.id+"/"} className="link-dark link-underline-opacity-0">{task.done ? "Не сделано" : "Сделано"}</Link>
+                            </Dropdown.Item>
                             <Dropdown.Divider />
-                            <Dropdown.Item onClick={()=>up(task)} disabled={task.position == 1}>Вверх</Dropdown.Item>
-                            <Dropdown.Item onClick={()=>down(task)} disabled={task.position == count}>Вниз</Dropdown.Item>
+                            <Dropdown.Item disabled={task.position == 1}>
+                                <Link to={"/task/up/"+task.id+"/"} className="link-dark link-underline-opacity-0">Вверх</Link>
+                            </Dropdown.Item>
+                            <Dropdown.Item disabled={task.position == count}>
+                                <Link to={"/task/down/"+task.id+"/"} className="link-dark link-underline-opacity-0">Вниз</Link>
+                            </Dropdown.Item>
                             <Dropdown.Divider />
-                            <Dropdown.Item onClick={()=>edit(task)}>Редактировать</Dropdown.Item> 
-                            <Dropdown.Item onClick={()=>del(task)}>Удалить</Dropdown.Item>
+                            <Dropdown.Item>
+                                <Link to={"/task/edit/"+task.id+"/"} className="link-dark link-underline-opacity-0">Редактировать</Link>
+                            </Dropdown.Item> 
+                            <Dropdown.Item>
+                                <Link to={"/task/delete/"+task.id+"/"} className="link-dark link-underline-opacity-0">Удалить</Link>
+                            </Dropdown.Item>
                           </Dropdown.Menu>
                         </Dropdown>
     
