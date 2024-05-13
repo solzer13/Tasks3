@@ -1,6 +1,6 @@
 export class Task {
-    id: number|string = 0;
-    parent: number = 0;
+    id: number | string = 0;
+    parent: number | string = 0;
     done: boolean = false;
     position: number = 0;
 
@@ -33,11 +33,11 @@ export function getListAll(): Task[] {
     return tasks;
 }
 
-export function getListByParent(parent: number): Task[] {
+export function getListByParent(parent: number|string): Task[] {
     return getListAll().filter(task => task.parent == parent);
 }
 
-export function countTasksByParent(parent: number, recursive: boolean = false): number {
+export function countTasksByParent(parent: number|string, recursive: boolean = false): number {
     const listParent = getListByParent(parent);
     if(!recursive)
         return listParent.length;
@@ -46,14 +46,14 @@ export function countTasksByParent(parent: number, recursive: boolean = false): 
     return count;
 }
 
-export function countTasksDoneByParent(parent: number): number {
+export function countTasksDoneByParent(parent: number|string): number {
     const list = new Tasks().parent(parent).list;
     let count = new Tasks().parent(parent).done(true).count;
     list.forEach(item => count += countTasksDoneByParent(item.id));
     return count;
 }
 
-export function getTaskById(id: number): Task {
+export function getTaskById(id: number|string): Task {
     const task = getListAll().find(task => task.id == id);
     if(task)
         return task;
@@ -61,7 +61,7 @@ export function getTaskById(id: number): Task {
         throw("Task not found.")
 }
 
-export function getTaskByPosition(parent: number, position: number) {
+export function getTaskByPosition(parent: number|string, position: number) {
     return getListByParent(parent).find(task => task.position == position);
 }
 
@@ -161,14 +161,14 @@ export class Tasks {
         return this.tasks.length;
     }
     
-    public id(id: number){
-        const result = this.result.find(task => task.id == id);
+    public id(id: number|string){
+        const result = this.tasks.find(task => task.id == id);
         if(!result)
             throw("Task not found.")
         return result;
     }
 
-    public parent(parent: number){
+    public parent(parent: number|string){
         this.tasks = this.tasks.filter(task => task.parent == parent);
         return this;
     }
@@ -186,20 +186,20 @@ export class Tasks {
     }
 
     public add(title: string, parent: number) {
-        let id = this._list.length + 1;
+        let id = this.tasks.length + 1;
         let position = id;
         let done = false;
-        this._list.push({ id, parent, title, done, position });
+        this.tasks.push({ id, parent, title, done, position });
         this._save();
     }
 
     public del(task: Task) {
-        this._list = this._list.filter(item => item.id != task.id);
+        this.tasks = this.tasks.filter(item => item.id != task.id);
         this._save();
     }
 
     public edit(task: Task) {
-        this._list = this._list.map(item => (item.id == task.id ? task : item));
+        this.tasks = this.tasks.map(item => (item.id == task.id ? task : item));
         this._save();
     }
 
@@ -209,7 +209,7 @@ export class Tasks {
             headers: {
                 "Content-Type": "application/json;charset=utf-8"
             },
-            body: JSON.stringify(this._list)
+            body: JSON.stringify(this.tasks)
         });
     }
 }

@@ -29,7 +29,7 @@ export function TasksPage({ parent }: TasksPageProps) {
 
     return (
         <>
-            <AppBar title={taskId == 0 ? "Tasks" : getTaskById(params.id).title} />
+            <AppBar title={taskId == 0 ? "Tasks" : getTaskById(taskId).title} />
             <TasksList
                 tasks={tasks}
             />
